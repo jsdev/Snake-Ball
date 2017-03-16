@@ -46,11 +46,15 @@ function hideEyes(SNAKE) {
 function buildAI() {
   hideEyes(AI)
   if (AI.body && AI.body.length) AI.body.forEach(function(s){ s.hide() })
-  buildSnake(AI,-100,-100)
+  var randomX = random([random(-20,-100),random(800,900)])
+  var randomY = random([random(-20,-100),random(1070,1150)])
+  buildSnake(AI,randomX,randomY)
 }
-function setBG(){
+function setStage(){
   song('bumblebee')
   MSG.change('')
+}
+function setBG(){
   PLAYER.IMG = random(SNAKE_IMAGES)
   AI.IMG = random(SNAKE_IMAGES.filter(function(s){return s!==PLAYER.IMG}))
   fill([PLAYER.IMG,AI.IMG].includes('ball8') ? 'park' : 'space4');
@@ -68,6 +72,7 @@ function gameLoop () {
   if (collisions.length) {
     console.log(collisions)
     die(AI)
+    setBG()
     buildAI()
   }
   
@@ -77,7 +82,8 @@ function gameLoop () {
     die(PLAYER)
     silence()
     MSG.change(START_GAME)
-    this.tap = init
+	this.touching = function () { }
+	this.tap = init
     return
   }
 }
@@ -90,12 +96,14 @@ function hitAI(bodyPart) {
 }
 
 function init() {
-  find(FOOD_IMG).forEach(function(f){f.hide()});
+  find(FOOD_IMG).forEach(function(f){f.hide()})
+  setStage()
   setBG()
   food = null
   buildAI()
   buildPlayer()
-  this.tap = function () { aimHead(PLAYER,x,y) }
+  this.tap = function () { }
+  this.touching = function () { aimHead(PLAYER,x,y) }
   this.loop = gameLoop
 }
 
@@ -124,7 +132,7 @@ function slither(SNAKE) {
         candy.hide()
         SNAKE.consumed = SNAKE.consumed + 0.1
         SNAKE.SCORE.change(Math.floor(SNAKE.consumed))
-        sound('chomp')
+        //sound('chomp')
         hasEaten = true
       }
     });
